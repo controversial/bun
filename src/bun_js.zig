@@ -48,6 +48,8 @@ pub const Run = struct {
         JSC.markBinding(@src());
         @import("bun.js/javascript_core_c_api.zig").JSCInitialize();
 
+        _ = C.setTtyOrigTermiosIfNeeded();
+
         js_ast.Expr.Data.Store.create(default_allocator);
         js_ast.Stmt.Data.Store.create(default_allocator);
         var arena = try Arena.init();
@@ -220,6 +222,8 @@ pub const Run = struct {
         vm.global.handleRejectedPromises();
 
         vm.onExit();
+
+        _ = C.setTtyRawMode(false);
 
         if (!JSC.is_bindgen) JSC.napi.fixDeadCodeElimination();
         Global.exit(@boolToInt(this.any_unhandled));
